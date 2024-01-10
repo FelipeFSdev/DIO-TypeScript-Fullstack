@@ -1,0 +1,73 @@
+- Linguagem Typescript:
+    Criada a partir da linguagem JavaScript, o Typescript surgiu como um
+    "superset" para melhoria de perfomance e solução de erros do JS.
+    Com typescript é possível realizar a "tipagem" de váriaveis, tornando
+    o código mais limpo, com feedback mais rápido, refatorações simples e
+    evitando erros e comportamentos incomuns como:
+        const obj = { largura: 10, altura: 15 };
+        const area = obj.largura * obj.atura;
+        console.log(area)
+        **terminal: NaN
+    Com typescript uma mensagem será mostrada na tela indicando um erro de 
+    grafia, apontando que "altura" está escrito errado, impedindo que o  
+    código seja iniciado.
+    obs: Por se tratar de um superset de outra linguagem, é necessário a 
+    instalação de sua biblioteca e configuração através do gerenciador de 
+    pacotes do node (npm) como ferramenta de desenvolvimento.
+
+- Configurando a linguagem:
+    Assim como outros pacotes do javascript, é necessário a inicialização
+    de um "projeto" dentro de um diretório do computador, utilizando "npm
+    init".
+    Feita a inicialização, será necessário a instalação de duas bibliotecas:
+        -D typescript
+        -D ts-node-dev
+        obs: ts-node-dev servirá como ferramenta de teste para o código
+        em typescript, tendo em vista que o node só executa programas em
+        javascript.
+        obs2: para que seja possível o uso do ts-node-dev, é necessário
+        a criação de um "script" no arquivo "package.json".
+    Vale ressaltar que o typescript é usado apenas como ferramente de
+    desenvolvimento, ou seja, todo o código feito em typescript será, 
+    posteriormente, convertido/copiado para um arquivo ".js" através do
+    comando "npx tsc arquivo.ts" quando for testar em produção.
+
+- Váriaveis e tipos: 
+    A sintaxe do typescript é simples, pessoas já familiarizadas com o js
+    perceberão que é quase idêntica, diferencia-se apenas pela adição de
+    tipos.
+    Ex: javascript
+        var exemplo1 = "2" **obs: var não é mais utilizando
+        let exemplo2 = 2
+        const exemplo3 = "dois"
+    O exemplo acima mostra a declaração de 3 váriaveis, sendo a primeira
+    e terceira do tipo string e a segunda do tipo number. Porém não é 
+    possível identificar de forma efetiva quais os tipos de cada váriavel
+    a menos que seja chamado o método "typeof".
+    Ex: typescript
+        let exemplo1: number = 2
+        const exemplo2: string = "2"
+    Diferentemente do primeiro exemplo, é possível restringir quais valores,
+    ou melhor, quais tipos de dados poderão ser associados à váriavel. Sendo
+    "exemplo1" do tipo number (só pode receber numeros como valor) e "exemplo2"
+    do tipo string (só pode receber strings como valor).
+    Para realizar a tipagem de váriaveis é possível utilizar os tipos:
+        number: números
+        string: cadeia de caracteres
+        boolean: valor binário (true/false)
+        any: a váriavel poderá receber qualquer valor (boolean, number, etc)
+        objeto: a váriavel deverá possuir os mesmos atributos e tipos do objeto 
+        criado (e referenciado) a partir da palavra reservada "interface".
+        tipo[]: para tipar arrays. Pode-se também usar "Array<tipo>".
+    
+- Estruturas condicionais, loops e manipulação de arrays:
+    O typescript aproveita exatamente as mesmas estruturas do javascript, sendo
+    possível o uso do while, for/each, for/of, etc. E métodos de string e array.
+    Ex: 
+        if (a > b){                         while (a < b){
+            console.log(a)                      console.log(a)
+        } else if (a === b){                    a+=1
+            console.log(a, b)               }
+        } else {
+            console.log
+        }

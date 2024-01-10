@@ -1,0 +1,82 @@
+- Paradigmas de programação:
+    Classificação linguagens tomando como base suas funcionalidades e
+    aplicações.
+    Dentre as diversas linguagens de programação existente é possível
+    identificar paradigmas de programação estruturada, funcional, 
+    orientada a objeto, entre outras.
+
+- Orientação a objeto:
+    Também conhecida como POO, este paradigma se baseia no conceito 
+    de objetos e atributos, além de características de hierarquia e
+    polimorfismo.
+    Objetos são váriaveis que possuem mais de uma tipo de dado a cerca
+    de um objeto de estudo específico alocando apenas um espaço na
+    memória. 
+    Ex:
+        objeto Pessoa = {
+            nome,
+            idade,
+            cpf,
+            endereço
+        }
+    Olhando para o mundo real, pessoas possuem diversas características
+    únicas, características essas que são trazidas para dentro da
+    programação como atributos (ou propriedades).
+    Além de atributos simples, é possível também "armazenar" dentro de 
+    objetos procedimentos e operações, chamados de métodos.
+
+- POO com typescript:
+    Aplicando os conceitos vistos até o momento a uma linguagem,
+    nesse caso, typescript, é necessário primeiramente a declaração
+    de uma classe (um objeto que será utilizado como base para criação)
+    de outros objetos.
+    Uma classe conta com atributos que serão usados por outros objetos
+    e um método constructor, para que seja possível atribuir valores
+    aos devidos atributos.
+    Ex:
+        class Account {
+            name: string
+            accNumber: number
+
+            constructor(name: string, accNumber){
+                this.name = name
+                this.accNumber = accNumber
+            }
+        }
+    Note o uso da palavra reservada "this". Esta função é utilizada
+    sempre que for necessário referenciar algum atributo dentro da
+    classe (ou objeto) em que está trabalhando.
+    Nesse caso, ponto a ponto do código, existe uma classe chamada
+    Account que receberá nome (name: string) e número (accNumber:
+    number). Ao ser, primeiramente, instanciada dentro de uma váriavel,
+    são passados os parâmetros (comumentes criados com os mesmos
+    nomes de seus atributos), os quais serão capturados pelo constructor
+    e atribuidos os valores as suas respectivas propriedades.
+    Ex:
+        const conta = new Account("contaNova", 13524)
+        console.log(conta)
+        **no terminal
+            contaNova
+            13524
+
+- Herança:
+    Com intuito de evitar repetição e reescrita de código (que pode
+    ocasionar em erros), o conceito de herança possibilita que uma 
+    classe compartilhe atributos e métodos com outras.
+    Ex:
+        class Admin extends Account{
+            balance: number
+
+            constructor(name: string, accNumber:number, balance:number){
+                super(name, accNumber)
+                this.balance = balance
+            }
+        }
+    Assim a classe Admin vai herdar atributos da classe Account, como 
+    "name" e "accNumber" e utilizar o "super()" para atribuir valores
+    aos atributos herdados.
+
+- Polimorfismo:
+    Semelhante ao conceito de herança, possibilita uma classe filha
+    herdar os métodos de classes mães, porém, alterando sua 
+    assinatura e fluxo de código.
