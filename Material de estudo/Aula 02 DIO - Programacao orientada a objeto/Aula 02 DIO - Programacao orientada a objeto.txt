@@ -80,3 +80,24 @@
     Semelhante ao conceito de herança, possibilita uma classe filha
     herdar os métodos de classes mães, porém, alterando sua 
     assinatura e fluxo de código.
+
+- Classes abstratas e visibilidade de atributos:
+    Classes abstratas podem ser definidas como classes que definirão
+    atributos e/ou valores que serão utilizadas também por outras 
+    classes, porém, sem a possibilidade de ser instanciada como objeto.
+    Para declaração de classes abstratas, usa-se a palavra reservada
+    "abstract" antes da declaração de classe.
+    Ex: 
+        abstract class Account{}
+    Referente a visibilidade de atributos de uma classe, é definido
+    por padrão, quando não fazemos a declaração explicita do tipo de
+    visibilidade, o tipo "public", ou seja, será possível o acesso
+    ao atributo ou método em qualquer parte do código.
+    Diferentemente, para evitar mudanças inesperadas de um valor de
+    um atributo, é possível a definição de atributos como "private",
+    assim, somente será possível o acesso de algum atributo através 
+    de métodos dentro da classe mãe.
+    Outro "estado de visibilidade" possível de se trabalhar é o 
+    readonly. Esse estado permite o acesso global a uma propriedade
+    porém, impede sua modificação sob qualquer circunstância. Como
+    o nome sugere, é possível apenas a leitura do valor.
