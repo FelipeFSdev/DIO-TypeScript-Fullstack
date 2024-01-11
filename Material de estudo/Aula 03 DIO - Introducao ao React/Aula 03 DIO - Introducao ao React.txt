@@ -1,0 +1,69 @@
+- Introdução ao react:
+    Biblioteca e framework javascript para desenvolvimento de páginas web.
+    Sendo uma das ferramentas de criação mais utilizadas do momento, react
+    é mantido pelo facebook e comunidade de desenvolvedores individuais(a
+    principal vantagem de ferramentas opensource).
+    O react trabalha com o conceito de "Components" e React Hooks, o que
+    contribue para o desenvolvimento mais rápido e prático, além de agilidade
+    na renderização das páginas.
+
+- Utilização do React em projetos:
+    Feita a inicialização de um diretório de projeto (npm init), é feita
+    a instalação da biblioteca pelo seguinte comando:
+        npm i create-react-app
+    A biblioteca instala todas as ferramentas e utilitários para possibilitar
+    a criação de um diretório completo com recursos necessários para a
+    criação de uma página web. Criação essa feita pelo comando:
+        npx create-react-app nomeDoProjeto
+    Além de configurações relacionadas diretamente ao projeto, o create-
+    react-app também traz ferramentas para realização de testes unitários.
+    obs: Por se tratar de uma biblioteca nativa do javascript é necessário
+    o uso de um "template" para que seja possível o desenvolvimento em 
+    typescript, nesse caso a inicialização do projeto ficaria assim:
+        npx create-react-app nomeDoProjeto --template typescript
+    obs2: Projetos react apesar de possuírem interface e interação com
+    usuário, são renderizados do lado do servidor, sendo necessário
+    a inicialização via "npm start" no terminal.
+    obs3: Com a utilização do react em projetos práticos é obrigatório
+    o fechamento de tags utilizando "/", mesmo aquelas que originalmente
+    não possuem fechamento como "<img>".
+
+- Componentes react(React Components):
+    De forma genérica "components" são funções typescript (ou javascript)
+    as quais serão retornadas uma tag HTML.
+    Possuem tag de abertura, primeira letra maiúscula (para diferenciação
+    das tags html) e fechamento.
+    Ex:
+        const Funcao = () =>{
+            return(
+                <div> Exemplo de componentes </div>
+            )
+        }
+        <Funcao />
+    Vale ressaltar a importância do uso de components para aumento de 
+    produtividade, facilitando leitura a manutenção do código, 
+    reduzindo a reescrita de códigos já escritos e facilitando a 
+    adição de novos recursos.
+    Relembrando ao conceito de hierarquia, uma características interessante
+    do React é o impedimento de retorno de dois componentes irmãos na 
+    mesma função, salvo em caso do uso da função "React.Fragment".
+    Ex:
+        const Funcao = () ={
+            return(
+                <div> Sem React.Fragment </div>
+                <div> Exemplo </div>
+            )
+        }
+    Este código acima indicaria um erro pelo react, impossibilitando
+    o início da aplicação.
+    Exemplo de código resolvendo o problema:
+        const Funcao = ()={
+            return(
+                <React.Fragment>
+                <div> Com React.Fragment </div>
+                <div> Exemplo </div>
+                </React.Fragment>
+            )
+        }
+    obs: O React.Fragment pode ser "simplificado" fazendo uso de 
+    tags vazias "<> </>" englobando as duas "divs" irmãs.
