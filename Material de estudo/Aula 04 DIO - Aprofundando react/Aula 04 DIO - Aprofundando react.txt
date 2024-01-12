@@ -1,0 +1,55 @@
+- Passando propriedades para dentro de componentes:
+    Através do conceito de props drilling, será possível a criação
+    de componentes dinâmicos e aninhamento de componentes, passando
+    um componente dentro de outro enquanto recebe um componente
+    como parâmetro, por exemplo.
+    Na criação de um componente, mais especificamente da função que
+    retornará o componente, é possível passar um argumento/parâmetro
+    para função. Este parâmetro será um objeto que poderá receberá
+    diversos tipos de valor (number, string, bool, etc).
+    obs: A adição de um parâmetro a um componente altera a forma de 
+    "chamar", sendo necessário, dentro das tags, passar também o/os
+    parâmetros pedidos.
+        Ex:
+            interface props {
+                id:number
+            }
+            const Funcao = ({id}:props) =>{
+                return(
+                    <div>Conteúdo qualquer com id={id}</div>
+                )
+            }
+            <Funcao id={2}/>
+        Assim tem-se uma função que recebe um objeto do tipo props
+        como argumento e retorna um componente com uma div.
+        Ao chamar esse componente passa-se o argumento pedido, no 
+        caso "id" e esse id é mostrado dentro da div usando "string
+        template".
+
+- Aninhando componentes:
+    Como falado no tópico anterior, é possível trabalhar com componentes
+    dentro de componentes, simplificando os arquivos principais da
+    aplicação, basta adicionar os componentes desejados dentro de um
+    único componente "principal".
+    Além da possibilidade de retornar um componente que retorna mais 
+    componentes, pode-se também usar componentes como argumento,
+    passando um objeto {children} como parâmetro do componente 
+    principal.
+    Ex:
+        const Componente = ({children}:any) =>{
+            return (
+                <Component1 />
+                {children}
+                <Component2 />
+            )
+        }
+        <Componente>
+        <Comp3 />
+        <Componente />
+    Repare que agora, possuindo o elemento {children}, o componente
+    assume a posição de abertura de fechamento separada, não mais
+    na mesma linha como um componente comum.
+    Outra observação a ser feita é que não existe uma necessidade
+    real da passagem de valor para {children}. Caso seja passado o
+    argumento, será retornado na página web, se não, é retornado 
+    apenas os demais conteúdos.
