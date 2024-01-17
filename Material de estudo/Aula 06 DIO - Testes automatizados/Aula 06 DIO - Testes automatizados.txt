@@ -1,0 +1,38 @@
+- Testes automatizados: 
+    Testes rápidos de implementações feitas em um projeto, realizados antes de 
+    subir os commits para "produção", sem necessariamente subir um servidor de
+    teste, verificando o fluxo de comportamento da aplicação e garantindo feed
+    back rápido.
+    Também possui papel de "documentação viva" do projeto.
+    Testes unitários, testes de integração, testes e2e (ponta-ponta).
+    Os testes são realizados em arquivos específicos separados com a extensão
+    ".test" seguido da extensão da linguagem do projeto.
+        Ex:
+            *arquivo: soma.tsx
+            *teste: soma.test.tsx
+    obs: Os arquivos de teste possuem nome igual aos arquivos que serão testados.
+
+- Escrevendo testes:
+    A sintaxe de testes possuem as mesmas características da linguagem que foi
+    desenvolvido o projeto. Neste caso, typescript.
+    Para realizar o primeiro teste unitário é utilizado uma função callback
+    chamada describe() em conjunto com a função it(), formando um aninhamento
+    de funções callback.
+    Ex:
+        Imaginando que seja necessário realizar o teste de uma função a qual
+        é esperado a soma do valor 1 ao numero digitado pelo usuário, o teste
+        é escrito da seguinte maneira:
+            describe('soma', () => {
+                it('somar 1 ao numero informado', () => {
+                    const value = soma(1)
+                    expect(value).toBe(2)
+                })
+            })
+        A função "describe()" recebe como primeiro argumento uma string,
+        normalmente utilizada para ajudar a compreensão do desenvolvedor
+        sobre qual função estpa sendo testada, nesse caso: "soma()". Como
+        segundo argumento, recebe uma função que executa a função "it()".
+        A função "it()", assim como "describe()", recebe uma string de 
+        descrição para auxiliar o desenvolvedor e como segundo parametro
+        recebe uma função contendo a função a ser testada e o valor
+        esperado que a função deve retornar, "expect().toBe()".
