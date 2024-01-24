@@ -1,5 +1,4 @@
 import { Box, Center, ChakraProvider, Image, Text } from '@chakra-ui/react'
-import './Header.css'
 export const Header = () => {
     return (
         <ChakraProvider>
