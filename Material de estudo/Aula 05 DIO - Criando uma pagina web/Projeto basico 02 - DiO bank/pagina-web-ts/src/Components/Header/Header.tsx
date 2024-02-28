@@ -3,7 +3,7 @@ export const Header = () => {
     return (
         <ChakraProvider>
             <Box
-                backgroundColor="white"
+                backgroundColor="#ff8080"
                 margin="5px 750px 15px 750px"
                 borderRadius="15px">
                 <Center>

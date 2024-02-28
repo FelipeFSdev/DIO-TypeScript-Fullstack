@@ -1,0 +1,80 @@
+- O que são estados?
+    De forma resumida, estados são informações armazenadas/atribuidas
+    como valor de atributo de um objeto.
+    Estados servem para criar interação entre o sistema e o usuário,
+    alterando a imagem de um "carrossel", adicionando compras ao 
+    "carrinho", etc. Tudo isso é feito através da mudança de valores
+    dos objetos, ou no caso, mudança de estado.
+
+- Método useState():
+    Anteriormente foi visto como funciona a criação de documentos e
+    páginas web utilizando conceitos de react, HTML e CSS. Porém, o
+    o desenvolvimento possui algumas outras etapas, como a manipulação
+    de estados (e consequentemente o que está sendo mostrado na tela)
+    e integração e/ou consumo de APIs.
+    Ao desenvolver um simulador de páginas de livro, por exemplo, é
+    necessário criar uma forma para mudar de uma página para outra, 
+    e para isso, a utilização de técnicas de persistência de dados
+    durante uma "re-renderização" da página, uma vez que a mudança
+    de valores de váriaveis locais não são suficiente para "avisar"
+    a api que é necessária uma nova renderização; o useState() se
+    faz necessário exatamente nesse sentido.
+    O método possui uma sintaxe parecida com a desestruturação de 
+    arrays, declarando uma variável e uma função dentro de colchetes
+    e referenciando o useState.
+    Ex:
+        const [value, setValue] = useState(0);
+    No exemplo acima é possível identificar um argumento dentro 
+    do método. Esse argumento será o novo valor a ser "setado"
+    para a váriavel "value". O "setValue" acima funciona apenas
+    como nomeação da função (implícita) para mudar estado da variável. 
+    obs: Assim como outros métodos iniciados com "use", o useState()
+    é definido, em React, como "Hook". E só pode ser chamado no
+    topo da função App() da aplicação.
+
+- Aplicando estados para trabalhar com formulários:
+    Formulários são criados com intuito de receber, armazenar e 
+    persistir dados os quais serão tratados e utilizados para
+    algum objetivo posterior.
+    Dado contexto, se for preciso desenvolver um código em que 
+    o usuário é chamado pelo nome de forma dinâmica, por exemplo, 
+    será preciso recuperar o nome enviado do teclado, esse nome
+    deve ser enviado para o backend e tratado para ser retornado
+    para o frontend.
+    Este tratamento de váriaveis de estado é feito a partir da
+    função nativa do HTML, onChange={}; e a manipulação do que
+    é chamado de "eventos". A função onChange executa uma ação
+    sempre que houver uma mudança no campo do formulário.
+    Tendo isto em mente, é possível fazer com que a cada letra
+    digitada pelo usuário seja chamada uma função para alterar
+    o estado da variável a ser retornada e para isto é usado o
+    argumento "event". Ao passar uma função callback dentro da 
+    função onChange, a cada mudança, é retornado um objeto com
+    orespectivo valor a ser modificado para o retorno dinâmico
+    para o usuário. Esse objeto é conhecido como evento, daí o
+    nome do argumento "event". O valor a ser modificado será o
+    atributo "value" do objeto (ou evento) que é disparado com
+    a digitação do usuário, ou seja, o alvo (ou "target").
+    Ex:
+        const [email, setEmail] = useState("");
+        <Input
+            type='email' placeholder='email'
+            value={email}
+            onChange={(event) => {
+            setEmail(event.target.value)
+        }} />
+    No código acima primeiramente foi definido um campo Input
+    para entrada de dados do tipo email e que terá a palavra
+    email para identificação quando não tiver nada dentro do 
+    campo. Em seguida é definido que o campo deve receber o 
+    valor "email", da váriavel "useState("")". Na função onChange
+    é chamado a função callback que dispara a função "setEmail()"
+    com o argumento "event.target.value". Este argumento irá
+    acessar o evento disparado a cada letra digitada (ou seja,
+    quando houver mudança (onChange)), acessar a propriedade
+    "target", que é o local onde está sendo feita a alteração
+    e por fim acessa a propriedade "value", que no caso é o 
+    valor digitado no campo input pelo usuário. Após acessar
+    o valor, a função setEmail realiza a mudança de estado da 
+    variável "email" que será mostrada em tempo real para o 
+    usuário.
