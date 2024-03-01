@@ -1,0 +1,86 @@
+- APIs:
+    APIs, a raso modo, são interfaces de aplicação para 
+    comunicação entre diferentes sistemas. APIs possuem 
+    diferentes conjuntos de rotinas e protocolos a depender
+    do contexto em que está inserido.
+    Ao falar de API, é necessário, também, entender conceitos
+    de programação assíncrona. É comum imaginar, ao rodar
+    um aplicativo ou abrir um arquivo de código para ler,
+    que o código será lido pelo interpretrador/compilador
+    linha a linha, caracterizando uma programação síncrona.
+    Ao desenvolver APIs, por outro lado, é necessário que 
+    as "Promises" sejam resolvidas para que o código possa
+    dar prosseguimento, e essa resolução é demorada, logo
+    torna-se inviável o uso de programação síncrona. Com o
+    uso de funções assíncronas no código é possível dar 
+    continuidade a execução do código "ignorando" a "Promise",
+    até que ela seja resolvida e então retornando o resultado.
+
+- Promises:
+    O conceito de promises é bem abrangente, e diferentes 
+    definições podem ser usadas. 
+    "Conclusão de uma operação assíncrona" ou 
+    "Proxy com valor não necessariamente conhecido, sendo
+    necessário a associação de manipuladores de valor para
+    o retorno não imediato, mas futuro do valor final"
+    Promises podem ter 3 estados: pending (pendente),
+    fullfiled(concluída e aceita) ou reject(rejeitada).
+    As duas últimas são resoluções possíveis, permitindo
+    agora a mudança de fluxo do sistema de acordo com os
+    estados em que a promise se encontra a partir do 
+    método de tratamento de exceções "try/catch", como um
+    "if/else".
+
+- Utilizando APIs com React:
+    O conteúdo da aula anterior ensinou a trabalhar e/ou
+    manipular estados utilizando hooks com react. Para o
+    processo de desenvolvimento de APIs usa-se conceitos
+    parecidos, desta vez, usando o hook useEffect().
+    A função useEffect() recebe como argumento uma função
+    callback, criando uma função assíncrona para resolver
+    a promise e, logo após, realizando o chamamento dessa
+    função (ainda dentro do escopo principal do argumento).
+    Ex:
+        useEffect(()=>{
+            const funcaoQualquer = async ()=>{
+               const qualquer = await coisa
+               console.log("qualquer")
+            };
+            funcaoQualquer();
+        });
+    O useEffect realizará o chamando dessa função, retornando
+    no console a palavra "qualquer", sempre que a página
+    for renderizada. Ou seja, se tiver uma função setState()
+    "linkada" com uma função onChange para formulários, por
+    exemplo, a cada letra digitada a palavra "qualquer" seria
+    impressa, pois ocorreria uma "re-renderização" a cada 
+    letra.
+
+- Renderização condicional:
+    Estruturas condicionais são comumente utilizadas na produção
+    de aplicações para definir o "rumo" que o sistema deve tomar
+    a partir de expressões lógicas. Contudo, essas condições são
+    verificadas no lado do servidor, por baixo dos panos no back
+    end. Ao trabalhar com React é importante entender que esses
+    conceitos de back e front acabam, por vezes, se misturando e
+    consequentemente criando uma "sintaxe" diferente do habitual.
+    A renderização condicional é um exemplo desse tipo. Imagine
+    que seja necessário criar uma tela de carregamento para uma 
+    página web, pois para realizar login em um site de streaming
+    é necessário consultar o banco de dados e verificar senha e 
+    login; e todo esse processo leva um certo tempo. Para uma 
+    melhor experiência de usuário, para que ele entenda que algo
+    está acontecendo, é realizada uma rederização de uma "segunda
+    página". Essa renderização, normalmente, é provocada pelas 
+    expressões lógicas contidas no documento HTML, ou melhor, no
+    documento React. Porém, como a página renderizada é feita
+    a partir de um documento HTML, é preciso adaptar a sintaxe 
+    da linguagem de programação para o HTML utilizando o operador
+    térnario.
+    Ex:
+        {(objeto1 === 0 || objeto2 === 3)} && <h1>Loading...</h1>
+    O exemplo acima é o equivalente para front, em ReactJS, a um:
+        if(objeto1 === 0 || objeto2 === 3){ return loading... }.
+    Ou seja: Se o objeto1 ou objeto 2 forem iguais a 0 ou 3, 
+    respectivamente, será renderizado no navegador o título 
+    "loading...".
