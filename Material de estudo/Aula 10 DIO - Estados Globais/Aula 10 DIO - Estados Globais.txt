@@ -1,0 +1,50 @@
+- Context API:
+    Conceito de iteração de váriaveis de estado globais, que
+    podem ser chamadas e/ou referenciadas em diferentes módulos,
+    a partir da criação de um contexto de uso.
+    Contextos são criados a partir de uma função do react
+    chamada createContext(). Esta função deve ser instanciada
+    dentro de uma váriavel.
+    Feita a instanciação da função, deve-se chamar um método
+    "provedor", o qual será declarado no arquivo raiz da 
+    aplicação como componente "pai" de todo o conteúdo a ser
+    renderizado.
+    obs: a instância da função deve ser feita declarando parâmetros
+    e indicando um valor para ele.
+    Ex:
+        interface InterfaceValue{
+            valor: number
+        }
+        import {createContext} from "react";
+        const contexto = createContext({} as InterfaceValue);
+        const contextoProvider = ({children}) =>{
+            return 
+            <contexto.provider value ={{valor}}>
+            {children}
+            </contexto.provider>
+        }
+        function App(){
+            return(
+                <BrowserRouter>
+                <contextoProvider>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/account/:id" element={<Account />} />
+                </Routes>
+                </contextoProvider>
+                </BrowserRouter>
+            )
+        }
+    Dessa forma, o conteúdo dentro do componente de contexto
+    (que estará em um arquivo próprio), poderá ser acessado 
+    em todas as diferentes páginas (ou arquivos). E todo o 
+    conteúdo renderizado será um "children" desse componente
+    de contexto.
+    A função createContext() receberá como parâmetro os valores
+    dos estados globais seguindo uma interface, enquanto para o 
+    provedor desse contexto, deve-se seguir o modelo de criação 
+    de componentes com "children props".
+    O acesso às varáveis globais se dá por meio de um Hook chamado
+    useContext(), o qual receberá como parâmetro a instância do 
+    createContext(), seguindo o exemplo acima:
+        const contextoHook = useContext(contexto)

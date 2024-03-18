@@ -1,0 +1,160 @@
+- Rotas:
+    Ao desenvolver APIs é esperado que haja uma comunicação
+    entre diferentes interfaces de sistemas, tanto no lado
+    do cliente, quanto no lado do servidor. Essa comunicação
+    é feita através de protocolos de rede, mais especificamente
+    o protocolo HTTP (HyperText Transfer Protocol).
+    O protocolo HTTP possui diferentes funções de transferência
+    de dados, seja recebendo ou enviando. Essas funções são
+    chamadas através de rotas de endereço, normalmente 
+    armazenadas e organizadas em um arquivo próprio.
+
+- Métodos HTTP:
+    GET - Responsável por "pegar" todas as informações e listar;
+    POST - Responsável por enviar informações;
+    PATCH - Responsável por fazer alterações em um documento;
+    PUT - Responsável por "trocar" um documento por outro, de forma
+    similar ao PATCH, porém alterando todo o documento;
+    DELETE - Responsável por fazer exclusões de dados.
+    Entendendo a funcionalidade de cada método HTTP, é possível
+    realizar a organização de um arquivo de rotas garantindo a 
+    implementação de diferentes funcionalidades e a melhor 
+    legibilidade do código.
+    obs: É possível a criação de diferentes rotas com o mesmo 
+    endereço, dependendo apenas do método HTTP utilizado. Ou 
+    seja, pode-se criar uma rota GET "./usuario/" e uma POST
+    "./usuario/", mas não duas GET "./usuario/".
+
+- React Router Dom:
+    Em javascript puro, utilizando nodejs, é comumente utilizado
+    o framework "Expressjs" para realizar a comunicação do
+    servidor e as rotas HTTP. O react-router-dom é um pacote
+    que faz o mesmo papel, quando utiliza-se react.
+    A biblioteca do react traz diversos métodos e ferramentas 
+    para definir as rotas da aplicação, começando pelo componente
+    <BrowserRouter> </BrowserRouter>. Este é um componente o qual
+    recomenda-se o uso sempre que for desenvolver um projeto web
+    com react em que um mesmo componente será usado em diferentes
+    rotas, pois é ele que vai disponibilizar toda configuração de
+    estilização e serviços, para as demais rotas. Dentro deste 
+    componente tem-se o <Routes> </Routes>, este será responsável
+    por procurar as rotas que combinem melhor com a URL fornecida 
+    entre suas rotas filhas. Por fim, as rotas são declaradas no 
+    componente <Route/>, que possuem como atributo o caminho, 
+    path="", o conteúdo a ser mostrado ao renderizar a página, 
+    element = {}. Algumas características interessantes sobre este
+    último componente é que, diferente dos outros, ele possui 
+    fechamento na mesma linha, e sempre será declarado dentro do 
+    componente pai, <Routes> </Routes>.
+    Ex:
+        <BrowserRouter>
+        <ChakraProvider>
+        <Header/>
+        </ChakraProvider>
+            <Routes>
+                <Route path="/" element = {
+                    <h1> Hello World </h1>
+                }
+                />
+            </Routes>
+        </BrowserRouter>
+    Obs: O método padrão de uso do componente <Route> é o método
+    GET, apenas listando e/ou mostrando o conteúdo da página.
+
+- Parâmetros de rota:
+    Ao observar uma URL, em qualquer site, é possível identificar 
+    diferentes "identificadores", separados por "/", "&", "=", ou
+    até mesmo palavras criptografadas. Estas palavras servem para 
+    indicar ao sistema/aplicação para onde ir, qual dado deve ser
+    recuperado, o que fazer, etc.
+    No tópico sobre rotas foi falado sobre o atributo "path", do 
+    componente <Route/>. Neste atributo define-se o caminho, ou 
+    identificador, da página que deve ser renderizada. A página 
+    principal de um site, por exemplo, pode ser comumente identificada
+    apenas com a /, em outro caso, se for necessário acessar a pagina
+    de contato, deve-se acessar o caminho "/contato" e assim por diante.
+    No caso de aplicações as quais sejam necessário recuperar um 
+    dado especifico de um grande "catálogo" de dados com vários 
+    registros, é necessário algum meio para que seja possível acessar
+    as informações, e para essa finalidade são usados parâmetros 
+    de rota. 
+    O parâmetro de rota pode assumir dois formatos: query param,
+    que são parâmetros opcionais passados diretamente em qualquer 
+    URL no formato "?nomeDoParametro=valorDoParametro", estes são 
+    normalmente utilizados como filtro para consultas; ou route param,
+    que são literalmente os parâmetros de rota falados acima. Esses 
+    possuem função de identificador único para resgatar o catálogo
+    inteiro de registros, por exemplo, sem especificidade.
+    Ex:
+        "bancoDoMexico.com/conta/2" - Acessa informações genéricas quanto a conta 2
+        "bancoDoMexico.com/conta/2?operacao=2" - Acessa informações sobre operação 2 relacionadas a conta 2,
+        neste exemplo, podendo ser extrato da conta com apenas transações de saque.
+    O exemplo acima demonstra, no lado cliente, como a URL aparece 
+    para os usuários. No lado servidor entretanto, onde ocorre a 
+    criação desse parâmetro, têm-se o seguinte formato:
+        <BrowserRouter>
+        <ChakraProvider>
+        <Header/>
+        </ChakraProvider>
+            <Routes>
+                <Route path="/conta/:id" element = {
+                    <h1> Hello World </h1>
+                }
+                />
+            </Routes>
+        </BrowserRouter>
+    Nota-se que não se faz necessário a criação de parâmetros para
+    receber o parâmetro de consulta, apenas o parâmetro de rota, "id",
+    sendo este um número identificador único para conta.
+
+- Manipulação de parâmetros de rota:
+    Para que seja possível trabalhar com os parâmetros de rota
+    com react, é necessário utilizar uma função da biblioteca 
+    react-router-dom, o useParams(). 
+    O useParams() deve ser instanciado dentro de uma variável.
+    Ao utilizar este Hook, o retorno será sempre um objeto com
+    os dados passados na URL. Ou seja, para que seja possível 
+    manipular os valores pode-se usar desestruturação para 
+    "recuperar" apenas a propriedade a ser utilizada.
+    Ex:
+        import {useParams} from react-router-dom;
+        const params = useParams();
+        **ou
+        const {parametroDeRota} = useParams();
+    Outra ferramenta importante para interatividade entre 
+    diferentes rotas é o "useNavigate()". Este hook também
+    precisa ser instanciado e funciona como meio de redirecionar
+    o usuário para uma outra rota, ou página.
+
+- Estrutura do projeto:
+    Agora que já foi mostrado a forma de conexão com as rotas,
+    está na hora de organizar. Neste ponto do curso, tem-se 
+    noção de como o React trabalha, com componentes. Foi visto
+    também, como funciona a programação orientada a objeto e a 
+    separação de cada função em um módulo diferente, e agora 
+    como funciona a comunicação com as requisições de rota. 
+    Este último, é possível identificar no exemplo, que ao 
+    decorrer do projeto, pode criar um encadeamento enorme de 
+    código, afetando diretamente a legibilidade do código. Por 
+    essa razão, no desenvolvimento de um produto de software 
+    deve-se criar arquivos separados para cada rota usada no 
+    sistema, arquivos estes que virarão componentes a serem 
+    usados no arquivo principal da aplicação.
+    Ex:
+        **criação de diretório - Páginas
+        **criação de arquivo para página inicial - PaginaInicial
+        **criação de arquivo para página de contato - PaginaContato
+        **no arquivo principal - 
+            function App (){
+                return (
+                    <BrowserRouter>
+                        <ChakraProvider>
+                        <Header/>
+                        <Routes>
+                            <Route path="/" element = {<PaginaInicial/>}/>
+                            <Route path="/contato" element ={<PaginaContato/>}/>
+                        </Routes>
+                        </ChakraProvider>
+                    </BrowserRouter>
+                )
+            }
