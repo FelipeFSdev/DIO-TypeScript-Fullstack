@@ -1,0 +1,135 @@
+- Local Storage:
+    Assim como variáveis locais e variáveis de estado
+    o armazenamento dos valores, caso não seja tratado,
+    é restrito a seção (renderização) atual da página,
+    isto quer dizer que ao recarregar a página o valor
+    do estado volta ao seu valor inicial.
+    Ex:
+        Com useState() é definido uma variável de nome
+        "redondo", com a função setRedondo define-se o
+        valor "true". Porém a condição para que ocorra
+        essa alteração é desenhar um círculo na página.
+        Uma vez desenhado, altera-se o estado. Porém a
+        internet oscila e a página é recarregada. Será
+        necessário desenhar novamente o círculo para o
+        estado ser alterado para "true". Isto porque a
+        variável não está sendo salva localmente.
+    Neste contexto, é possível fazer o armazenamento de 
+    valores, estados, etc; dentro de um objeto presente
+    nos navegadores ao realizar a renderização de uma 
+    página, o localStorage.
+    Assim como outros recursos nativos, uma boa forma de
+    manipular o localStorage é fazendo o isolamento em
+    um serviço/arquivo específico.
+
+- Método setItem():
+    Sua função é criar uma propriedade e atribuir valor
+    dentro do objeto localStorage.
+    Recebe como primeiro argumento o nome da propriedade,
+    seguido de seu valor, este será convertido para string
+    assim que sua renderização for feita.
+    Desta forma, pode-se perceber que o objeto localStorage
+    apenas aceita valores do tipo string.
+    obs:
+        Esse método, assim como os demais referentes
+        ao localStorage, devem ser chamados dentro de 
+        funções. Estas serão chamadas dentro do arquivo
+        principal da aplicação. Esta chamada deve ser 
+        feita antes do retorno da aplicação, criando 
+        assim, o espaço de armazenamento ao renderizar
+        a página pela primeira vez.
+    obs:
+        O método setItem é uma função sem retorno, ou seja,
+        ao desenvolver aplicações com typescript, é preciso
+        a tipagem das funções como "void".
+        
+- Salvando objeto dentro do localStorage:
+    Assim como o localStorage é um objeto nativo do JS 
+    e possui métodos próprios, pode-se usar outras ferramentas
+    nativas do javascript, como sua notação de objetos, JSON.
+    Com o método .stringify do JSON, torna-se possível a 
+    atribuição de objetos completos como propriedades de 
+    um novo objeto a ser introduzido dentro do localStorage
+    com o método setItem().
+    Ex:
+        const objeto1 = {
+            propriedade1: 1234,
+            propriedade2: cincoSeis
+        };
+        localStorage.setItem("nomePropriedade",JSON.stringify(objeto1));
+    Assim, ao fazer a chamada do localStorage, terá uma 
+    nova propriedade chamada nomePropriedade e que será
+    um objeto com as propriedades "propriedade1" e 
+    "propriedade2".
+    obs: O método stringify do JSON funciona como "conversor"
+    de dados javascript para string.
+
+- Persistindo valores:
+    Nesta etapa, primeiramente, é necessário que haja a
+    alteração do valor da propriedade do objeto passado 
+    para o localStorage. Esta é feita através do mesmo 
+    método de criação (setItem) porém com a presença de
+    um parâmetro. O parâmetro em questão será passado 
+    como novo valor para a propriedade. 
+    A mudança de valor deve seguir o mesmo fluxo da API
+    context, com valores booleanos e verificações para 
+    permitir ou bloquear acesso a outras páginas.
+    Feito isto, pode-se verificar, com auxilio do método
+    getItem, se o localStorage possui alguma propriedade 
+    ou não, e definir que a criação do objeto somente irá
+    ocorrer caso o localStorage não contenha o elemento 
+    buscado pelo getItem, desta forma o objeto criado a 
+    partir do setItem só será criado uma única vez e não
+    haverá sobrescrição caso uma alteração de valor seja 
+    feita e houver uma re-renderização da página.
+    Após esse processo, é necessário manipular os valores
+    da API context de forma dinâmica. Sabendo que o valor
+    salvo no localStorage é do tipo booleano, pode ser 
+    passado como estado da variável controladora da API
+    context.
+    Com auxilio do hook para sincronização de sistemas e 
+    componentes react (ou consumo de api - useEffect()),
+    pode-se criar uma estrutura condicional para alterar
+    (e persistir) o estado da variável somente se existir
+    o local desejado para armazenamento.
+    Ex:
+        interface IExemplo{
+            login: boolean
+        }
+        const exemplo = {
+            login: false
+        }
+        const createStorage = (): void =>{
+            localStorage.setItem("armazenamento", JSON.stringify(exemplo))
+        }
+        const changeValue = (exemplo: IExemplo): void =>{
+            localStorage.setItem("armazenamento", JSON.stringify(exemplo))
+        }
+        const verifyLocalStorage = (local: string):string | null = >{
+            localStorage.getItem(local)
+        }
+    **no arquivo principal 
+        !verifyLocalStorage("armazenamento") && createStorage()
+        changeValue({exemplo: true})
+    **na API context
+        const local = verifyLocalStorage()
+        const [loggado, setLoggado] = useEffect()
+        useEffect(() =>{
+            if(local){
+                const {login} = JSON.parse(local)
+                setLoggado(login)
+            }
+        })
+    Desta forma, pode-se perceber todos os passos
+    descritos, desde a criação de armazenamento a 
+    persistência de estado de forma dinâmica com 
+    API context, hooks do react e métodos JSON.
+    obs:
+        O método JSON.parse funciona de forma igual
+        porém contrária ao JSON.stringify, convertendo
+        strings em objetos. 
+    obs: 
+        O uso do useEffect se faz necessário para 
+        permitir a re-renderização de uma ou mais
+        variáveis para que seja feito a alteração 
+        de um estado.
