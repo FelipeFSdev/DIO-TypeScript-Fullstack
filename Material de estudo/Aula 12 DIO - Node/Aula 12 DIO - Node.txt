@@ -1,0 +1,125 @@
+- Backend com node:
+    Também chamado de nodejs, é um software para desenvolvimento
+    backend baseado na linguagem javascript. 
+    Anteriormente sendo utilizada apenas para desenvolvimento de 
+    interfaces web e integração com outras linguagens, como PHP,
+    foi se fazendo necessário, por programadores, uma linguagem
+    que permitisse a escalabilidade do sistema, percebendo a 
+    praticidade do modelo assíncrono e a orientação a eventos do 
+    javascript, Ryan Dahl decidiu desenvolver uma ferramenta que 
+    pudesse criar servidores para "rodar" no lado backend.
+    O node segue modelo single thread, ou seja, cria uma pilha
+    de funções chamadas e as executa uma por vez.
+
+- Status code e métodos HTTP:
+    Visto de forma breve anteriormente, os métodos HTTP e códigos
+    de estado da aplicação são responsabilidade exclusiva do lado
+    servidor, ou seja, cabe a API manipular, retornar e atender 
+    corretamente as requisições do usuário, utilizando "GET" para 
+    listar todos os usuários com status code "200", por exemplo.
+    Status code possuem uma característica interessante que podem
+    ajudar o desenvolvedor a entender o estado real da aplicação,
+        códigos a partir do 200 até o 299, são códigos de sucesso;
+        códigos a partir do 400 até o 499, são erros de usuário;
+        códigos a partir do 500 até o 599, são erros de servidor;
+
+- Configuração inicial da aplicação:
+    Assim como a inicialização de um projeto react, utiliza-se o 
+    gerenciador de pacotes "npm" para poder inicializar uma pasta
+    dedicada a aplicação. No diretório dedicado, o comando: "npm 
+    init -y" cria um arquivo package.json, que indica que possui 
+    algumas configurações básicas referente ao servidor, como as 
+    dependencias instaladas, nome, arquivo principal, etc.
+    Relembrando as primeiras aulas, é necessário a instalação dos
+    pacotes para utilização do typescript em desenvolvimento:
+        npm i -D typescript ts-node-dev
+        npx tsc --init
+    Feita a inicialização do typescript, é necessário passar uma 
+    nova propriedade chamada "include" para dentro do diretório 
+    tsconfig.json. A propriedade vai receber a pasta source(src)
+    da aplicação, a qual será "transpilada" para javascript no 
+    momento da inicialização do servidor. Em sequência, altera-se
+    a propriedade "outDir" para receber "./build", ou seja, esta
+    propriedade criará o diretório "build" ao fazer a transpilação.
+    Para "dar trigger" na transpilação pode-se criar um script 
+    no arquivo package.json que receberá "rimraf ./build && tsc",
+    este comando irá remover a pasta "build" (se existir) e criar 
+    uma nova. Assim, para iniciar a aplicação em produção, deve-se
+    iniciar a partir da pasta build, que conterá os arquivos js.
+    Ex: 
+        **no tsconfig.json
+        "outDir":"./build"
+        "include":["src"]
+
+        **no package.json
+        "scripts":
+            "build":"rimraf ./build && tsc",
+            "start": "node ./build/index.js"
+            "dev": "ts-node-dev ./src/index.ts"
+    obs: 
+        A transpilação citada acima funciona como uma tradução
+        da linguagem typescript para javascript. Esta ferramenta
+        é utilizada, pois o typescript é apenas uma ferramenta 
+        de desenvolvimento. Ao inicializar uma aplicação o node 
+        apenas interpreta o código javascript, sendo necessário 
+        ajustar o código de uma linguagem para outra. Desta forma,
+        a pasta "build" terá todos os componentes (arquivos e 
+        diretórios) da pasta "src", porém, traduzida para JS.
+
+- Servidor Expressjs:
+    Express é um framework/biblioteca para nodejs que permite a 
+    criação e configuração de servidores web. Sua instalação se 
+    faz assim como outras bibliotecas: "npm i express".
+    obs: 
+        Trabalhando com typescript, é possível que seja necessário
+        também fazer a instalação dos tipos referentes ao express:
+            npm i -D @types/express
+    Sua utilização se faz a partir da importação e instanciação 
+    de suas funções dentro de uma variável, comumente chamada de 
+    "server" ou "app".
+    Ex:
+        import express, {Request, Response} from "express";
+        const app = express();
+    A primeira função do express utilizada é a "listen". Este 
+    método recebe um parâmetro obrigatório e um opcional, sendo
+    estes a porta lógica em que o servidor será aberto e uma 
+    função callback, respectivamente.
+    Ex:
+        app.listen(3000)
+        ou
+        app.listen(3000,()=>{})
+    Através da nomenclatura dos métodos HTTP, foi desenvolvido no
+    express funções que utilizam os métodos HTTP para realizar a
+    criação de rotas de requisição. Esses funções recebem como o 
+    primeiro parâmetro: a rota em que será acessada pela rota; e 
+    como segundo parâmetro: a função que fará a requisição e todas
+    as funcionalidades referentes àquela rota até sua resposta.
+    Ex:
+        app.get("/", (req: Request, res: Response)=>{
+            return res.status(200).json({message: "API ok"})
+        })
+    Como resposta/retorno da função, percebe-se o uso de abreviações
+    para "request" e "response" e sua tipagem, além da definição do
+    status code para a rota e o uso do objeto de texto js, json, pra 
+    retornar uma mensagem ao usuário.
+    É comum em aplicações realizar cadastros de funcionários,
+    clientes, etc. Esse procedimento é feito recuperando dados
+    do corpo da requisição, este sendo no formato json o mais 
+    utilizado atualmente. Porém o express por padrão não usa 
+    o formato json, e para isso é preciso configurar a partir 
+    do método ".use()" para que seja possível fazer o cadastro.
+    Ex:
+        app.use(express.json());
+
+        app.post("/cadastro", (req: Request, res: Response)=>{
+            const {nome} = req.body;
+            return res.status(201).json(nome);
+        })
+    Em um cenário em que o express não foi configurado para 
+    trabalhar com json, a propriedade "nome" desestruturada do
+    corpo da requisição não poderia ser definida (se o corpo
+    da requisição estiver no formato de objeto json).
+    obs: 
+        Para realizar os testes de aplicações em desenvolvimento,
+        uma ótima forma é utilizar aplicativos de testes de API 
+        como Insomnia ou Postman.
