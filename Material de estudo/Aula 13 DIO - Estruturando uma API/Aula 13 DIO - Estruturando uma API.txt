@@ -1,0 +1,113 @@
+- Controladores:
+    Como visto anteriormente, ao criar rotas com o express
+    é necessário passar dois argumentos/parâmetros, a URL 
+    e a função de requisição + resposta. Esta função é 
+    chamada de controller/controlador.
+    Os controlares, para melhor mantenabilidade de código,
+    são postos em diretórios e arquivos dedicados de acordo
+    com sua função na aplicação.
+    Ex:
+        RaizDoProjeto
+            src
+                controllers
+                    arquivoControlador.ts
+    Desta forma, as funções referente a manipulação de um
+    arquivo são organizadas dentro de "arquivoContolador.ts".
+    Estas, por sua vez, são exportadas e importadas no arquivo
+    principal de rotas obedecendo a seguinte sintaxe:
+        **no arquivo do controlador
+            import {Request, Response} from "express"
+            export class ArquivoControlador {
+                lerArquivo = (req: Request, res: Response){
+                    const arquivo:string = "Backend com Typescript"
+                    return res.status(200).json(arquivo)
+                }
+            }
+        **no arquivo de rotas
+            import {ArquivoControlador} from "../controllers/arquivoContolador.ts"
+            const leitorDeArquivo = new ArquivoControlador();
+            
+            express.get("/arquivo", leitorDeArquivo.lerArquivo);
+    obs: 
+        A utilização de controladores pode variar de acordo
+        com o paradigma de programação em que a aplicação 
+        será desenvolvida. No caso do exemplo acima, a sintaxe
+        é referente à orientação a objeto.
+
+- Services:
+    Diretório dedicado a realização de operações referentes
+    a um elemento específico de uma aplicação. 
+    Enquanto os controladores são responsáveis por realizar
+    requisições, os "services" são chamados dentro dos 
+    controladores pra que as responsabilidades de cada função
+    sejam divididas adequadamente.
+    Dentro deste diretório se encontram funcionalidades
+    referentes a banco de dados, envio de emails, etc.
+    Ex: 
+        RaizDoProjeto
+            src
+                controllers
+                services
+                    ServicosDeUsuario.ts
+                        export class ServicosDeUsuario{
+                            cadastrarUsuario(email:string, senha:string){
+                                const usuario = {
+                                    email,
+                                    senha
+                                }
+                            *Adicionar ao banco de dados(usuario)
+                            }
+                        }
+        **no controlador
+            import {Response, Request} from "express"
+            import ServicosDeUsuario from "./services/ServicosDeUsuario.ts"
+
+            export class ControladorDeUsuario{
+                cadastrarUsuario(req: Request, res: Response){
+                    const servicosUsuario = new ServicosDeUsuario()
+                    const {email, senha} = req.body;
+                    servicosUsuario.cadastrarUsuario(email, senha)
+
+                    return res.status(201).json({message: "ok"})
+                }
+            }
+
+- Roteador/Router:
+    Assim como com componentes react, é importante fazer
+    o isolamento de rotas da aplicação. Melhorando a 
+    rastreabilidade, organização e mantenabilidade da API.
+    Em um arquivo dedicado, dentro do diretório src, é 
+    feita a importação da função "Router" do express, a 
+    qual é responsável por criar e distribuir as rotas.
+    A função Router precisa ser instanciada dentro de 
+    uma váriavel e para que seja chamada corretamente no
+    arquivo principal da aplicação, index.ts, é preciso
+    a declaração de "permissão" de uso do roteador.
+    Ex:
+        RaizDoProjeto
+            src
+                controllers
+                services
+                index.ts
+                routes.ts
+                    import {Router} from "express"
+                    import ControladorDeUsuario;
+
+                    export const routes = Router();
+
+                    const controladorUsuario = new ControladorDeUsuario;
+
+                    routes.post("/usuario", controladorUsuario.cadastrarUsuario);
+        **no index.ts
+            import express from "express"
+            import {routes} from "routes.ts"
+            const app = express();
+
+            app.use(routes);
+    obs:
+        Ao criar rotas, por boa prática, todas as operações
+        referentes aos usuários, por exemplo, é feita no 
+        endpoint "/usuario". Deste modo, pode-se realizar 
+        atualizações de cadastro, exclusão, novos cadastros,
+        tudo no mesmo endpoint, precisando apenas alterar os
+        métodos das rotas.
