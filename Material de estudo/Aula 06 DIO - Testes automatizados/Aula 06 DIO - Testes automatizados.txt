@@ -36,3 +36,14 @@
         descrição para auxiliar o desenvolvedor e como segundo parametro
         recebe uma função contendo a função a ser testada e o valor
         esperado que a função deve retornar, "expect().toBe()".
+
+- Mocks: 
+    Mocks são simulações de objetos reais usados tanto 
+    em testes backend como em frontent. Mocks permitem
+    replicar objetos grandes e complexos para testes 
+    rápidos de uma funcionalidade, sem necessariamente 
+    chamar toda a implementação. No caso de simulações
+    de função, pode-se utilizar o método "jest.fn()".
+    obs: 
+        mocks funcionam de forma limitada, trabalhando
+        apenas com os dados informados na simulação.

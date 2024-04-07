@@ -1,0 +1,222 @@
+- Configuração inicial dos testes unitários:
+    A configuração inicial dos testes unitários do 
+    backend se faz por meio de 3 ferramentas/pacotes
+    de desenvolvimento:
+        • npm i -D jest
+        • npm i -D ts-jest
+        • npm i -D @types/jest
+    Os dois últimos sendo necessários apenas caso 
+    a aplicação seja desenvolvida com typescript.
+    Feita a instalação das dependências, basta 
+    inicializar a partir do comando de execução de
+    pacotes do node:
+        npx jest --init
+    Ao executar o comando, será mostrado no terminal
+    algumas perguntas (y/n) referentes às configurações 
+    desejadas (usar o jest quando rodar script "test",
+    usar o typescript como linguagem padrão, etc).
+    Após responder todas as perguntas, será criado o 
+    arquivo de configuração do jest, como os arquivos
+    "package.json" ou "tsconfig.json".
+    Dentro do arquivo jest.config.ts, altera-se a 
+    propriedade "preset", para que o jest entenda 
+    que ao usar o comando "ts-jest", acione os testes
+    unitários. Ainda nas configurações, é necessário
+    definir quais arquivos o jest fará o monitoramento
+    de testes na propriedade "testMatch". Nela é 
+    passado um "pattern" indicando que qualquer arquivo
+    terminado em .test ou .spec com a extensão .ts,
+    .tsx, .js ou .jsx, será testado.
+    Ex: 
+        testMatch: [
+            "**/?(*.)+(spec|test).[tj]s?(x)"
+        ]
+    Ao fazer a instalação da biblioteca, pode-se 
+    notar que o script "test" do arquivo package.json
+    foi alterado. Isto para que sempre que for 
+    necessário, daqui em diante, realizar testes na
+    aplicação  deverá chamar o comando "npm run test".
+    obs:
+        Arquivos de teste possuem sempre o mesmo 
+        nome dos arquivos que eles irão testar,
+        complementando com ".spec" ou ".test" 
+        antes da extensão do arquivo original.
+
+- Testes unitários:
+    Assim como no desenvolvimento da aplicação os 
+    testes precisam ser feitos a partir de uma nova
+    instância das classes e funções a serem testadas.
+    Essencialmente os testes unitários do backend 
+    possuem a mesma estrutura dos testes frontend,
+    isso quer dizer que todo o código a ser testado
+    deve ser chamado em uma função "it()" que receberá
+    dois parâmetros. O primeiro sendo uma descrição
+    clara de como o código deve funcionar; e o segundo 
+    uma callback function chamando o código a ser 
+    testado, seguido do "retorno", ou seja, "expect()".
+    O expect() recebe um mock de um trecho de código 
+    e chamada um método de acordo com o comportamento 
+    esperado.
+
+- Mocks: 
+    Mocks são simulações de objetos reais usados tanto 
+    em testes backend como em frontent. Mocks permitem
+    replicar objetos grandes e complexos para testes 
+    rápidos de uma funcionalidade, sem necessariamente 
+    chamar toda a implementação. No caso de simulações
+    de função, pode-se utilizar o método "jest.fn()".
+    obs: 
+        mocks funcionam de forma limitada, trabalhando
+        apenas com os dados informados na simulação.
+
+- Injeção de dependências:
+    Técnica facilitadora para realização de testes em 
+    contextos complexos de banco de dados, por exemplo,
+    em que para testar uma função de cadastro seria 
+    necessário realizar toda a conexão do arquivo de 
+    teste com o banco de dados, pois a função de 
+    cadastro é dependente do banco de dados.
+    Por meio do construtor de classes, é transmitido 
+    todas dependências que o módulo precisa pra operar.
+    Porém, para que essa transmissão seja possível, é 
+    necessário usar o conceito de interface para criar
+    um tipo específico de objeto que o construtor irá
+    receber e, finalmente, poder criar o mock do objeto
+    que irá simular o banco de dados. Desta forma, o 
+    construtor irá referenciar, agora, a interface e 
+    não mais o banco de dados.
+    Ex: 
+        interface IDataBase {
+            name: string,
+            email: string
+        }
+        class UserService {
+            database: IDataBase[]
+
+            constructor(db = database){
+                this.database = db
+            }
+        }
+    Desta forma, tem-se um tipo específico para o 
+    array que irá simular o banco de dados, dentro
+    do construtor é definido um parâmetro, o parâmetro
+    será igual ao banco de dados (atributo) caso não
+    seja definido um banco de dados ao instanciar a 
+    classe; e durante a execução do construtor, ele
+    definirá o banco de dados (atributo) como sendo 
+    igual ao parâmetro. Com esta estrutura, é possível 
+    fazer a exportação da interface para que a mesma 
+    seja mockada e testada.
+
+- Mockando requisições: 
+    Semelhante a criação de controladores, é preciso criar
+    uma estrutura para recuperação dos dados para teste,
+    uma vez que requisições retornam informações de fora
+    do código "original".
+    Requisições HTTP possuem tipos e parâmetros próprios
+    de servidor (express), o que significa que os testes
+    precisam ser feitos com importações diretas de tipos
+    express.
+    Ex:
+        import { Params } from "express-serve-static-core";
+        import { Request } from "express";
+    A primeira importação diz respeito aos parâmetros que 
+    serão recuperados do corpo ou URL da requisição. Já a 
+    segunda ao tipo de operação (requisição ou resposta).
+    Com as importações feitas, deve ser feita uma função 
+    para criação dos mocks de requisição.
+    Ex:
+        const makeMockReq = ({params, query}:{params?: Params, query?: Params}): Request =>{
+            const objetoReq = {
+                params: params || {},
+                query: params || {}
+            } as unknown;
+            return mockReq as Request;
+        }
+        const mockRequest = makeMockReq({});
+    Linha a linha, tem-se que a função geradora de mock 
+    pode receber dois parâmetros de requisição (param ou 
+    query) que, se existirem, serão do tipo Params (tipo
+    importado do express); e seu retorno será uma requisição.
+    Dentro da função geradora é criado o objeto que terá
+    as propriedades params e query (que são opcionais),
+    podendo assumir o valor passado como parâmetro ou 
+    um objeto vazio (se não for passado nada como parâmetro).
+    O objeto será um valor "desconhecido" e será retornado
+    como requisição. Assim, pode-se criar o mock da requisição.
+    Este mock é necessário para que possa passar um parâmetro 
+    para teste de funções de controladores, que recebem um 
+    parâmetro de requisição, e um de resposta.
+    A criação do mock de resposta, porém, passa por 
+    um processo mais complexo.
+    
+- Mockando respostas:
+    Os mocks "response" para APIs são feitos a partir 
+    da criação de um tipo personalizado utilizando um
+    atributo nativo do typescript, "TResult".
+    Continuando a criação do "custom type", é preciso
+    definir a estrutura do objeto, ou seja, atributos
+    e tipos.
+    O TResult age como um método genérico para que se 
+    possa trabalhar com qualquer tipo de dado sem que 
+    necessite reescrever o código para cada tipo.
+    Ex:
+        type MockResponse<TResult> = Response & {
+            state:{
+                status?:number,
+                json?: TResult | unknown,
+            }
+        }
+    Neste trecho é inicializado a criação de um tipo
+    personalizado (MockResponse) que terá um retorno
+    genérico/não específico. Para atribuição de valor
+    é criada uma condição, "se Response existir, deve
+    receber/assumir a forma de um objeto com atributo
+    state, que também é um objeto, e recebe um status
+    e um json como propriedade".
+    Criado o tipo para o mock, é necessário criar a 
+    função "geradora" do mock, assim como no mock de 
+    request, porém, manipulando as propriedades json
+    e status, do tipo criado anteriormente. 
+    A manipulação dessas propriedades são feitas por 
+    meio de métodos manuais criados dentro da função
+    geradora, e para isso, a função deve seguir o
+    padrão "vanilla" de declaração, com a palavra 
+    reservada "function".
+    Ex:
+        function makeMockRes<TResult>(){
+            const objetoRes = {
+                state: {}
+            }
+
+            objetoRes.status = (status:number)=>{
+                objetoRes.state.status = status
+                return objetoRes
+            }
+
+            objetoRes.json = (json: TResult) =>{
+                objetoRes.state.json = json
+                return objetoRes
+            }
+
+            return objetoRes
+        } as MockResponse<TResult>;
+
+        const mockRes = makeMockRes();
+    Esses passos servem para simular o trabalho de
+    um navegador ao receber e devolver/responder a 
+    requisições feitas pelo servidor, permitindo o 
+    teste de controladores.
+
+- Organizando mocks:
+    Olhando para as funções e mocks de requisições
+    percebe-se o quão extenso ficaria o arquivo de 
+    teste, gerando confusão e ambiguidade de funções
+    dentro do arquivo, pois teria uma função para
+    geração de mocks em um arquivo que deveria ser 
+    apenas para testes.
+    Desta forma, voltando ao conceito de estrutura
+    de aplicações, pode-se fazer o isolamento dessas
+    funções em módulos próprios, uma vez que estas 
+    estruturas podem ser reutilizadas em diversos 
+    testes.
