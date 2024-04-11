@@ -1,0 +1,155 @@
+- ORM (Object Relation Mapper):
+    Técnica de mapeamento de objetos relacionais que
+    permite relacionar os objetos com os respectivos 
+    dados que eles representam.
+    Garante independência de banco de dados, aumenta
+    segurança e facilita manutenção.
+    De forma didática, aproxima o paradigma orientado
+    a objeto ao paradigma de banco de dado relacional
+    permitindo a construção de queries SQL por meio de
+    métodos na linguagem de programação utilizada.
+    
+- TypeORM:
+    Também conhecido como query builder, typeORM é um
+    pacote/biblioteca dentre várias outras disponíveis,
+    como sequelize.
+    Sua utilização é feita por meio da instação da lib,
+    sua dependência ("reflect-metadata") e o banco de 
+    dados (postgres, sqlite, mysql, etc).
+    Ex:
+        npm i typeorm
+        npm i reflect-metadata
+        npm i sqlite3
+    Além disso, caso o projeto seja desenvolvido em 
+    typescript, é necessário habilitar, no arquivo 
+    "tsconfig.json", as propriedades "experimentalDecorators",
+    "emitDecoratorMetadata" e "allowJs".
+
+- Conexão com banco de dados:
+    Em um projeto de software é comum encontrar os 
+    diretórios bem separados e definidos de acordo
+    com sua função no projeto (como controllers,
+    services, etc). O mesmo ocorre com o bando de 
+    dados.
+    Neste caso, porém, tem-se o diretório dedicado,
+    onde será armazenado o "dump.sql" (arquivo que 
+    contém os códigos de estruturação inicial do 
+    banco de dados) e arquivos ou diretórios para 
+    dependências e serviços referentes ao typeORM.
+    A configuração de um banco de dados no projeto 
+    deve ser feita em um arquivo dedicado. Pode-se 
+    criar um "index.ts" dentro do diretório do bd, 
+    indicando o arquivo principal de configuração.
+    Neste index.ts do banco de dados, deve-se ser 
+    feita a instanciação de uma classe do typeORM
+    chamada "DataSource" (raiz/fonte de dados), e 
+    consequentemente a criação do objeto com seus 
+    devidos atributos.
+    Ex:
+        import {DataSource} from "typeorm"
+        export const AppDataSource = new DataSource({
+            type: tipoDoBanco (mysql, sqlite, etc),
+            host: hospedagemDoBanco (localhost, elephantSQL, etc),
+            port: portaDoBanco (configurada na instalação),
+            username: usuarioDoBanco,
+            password: senhaDoBanco,
+            database: nomeDoBanco,
+            migrations: [
+                caminhoDaPastaMigrations/*.ts
+            ]
+        })
+    obs:
+        A configuração de cada banco de dados pode 
+        variar de acordo com seu tipo, SQLite, por 
+        exemplo, permite a configuração apenas com 
+        type, database e migrations.
+    Feita essa configuração inicial, para conectar
+    o banco é necessário realizar a importação dos
+    objeto AppDataSource e reflect-metadata no 
+    index.ts principal da aplicação e chamar a função
+    do AppDataSource, .initialize(). Lembrando que 
+    AppDataSource.initialize() é uma função async, 
+    então é necessário chamá-la juntamente com .then()
+    e .catch().
+    As funções .then() e .catch() funcionam como 
+    formas de tratamento de promises. .then() para 
+    promises resolvidas com sucesso; e .catch() para 
+    promises falhadas, podendo capturar e tratar o 
+    erro.
+    Em package.json, deve-se criar um script para 
+    que possa rodar automaticamente o orm através
+    de um comando npm.
+    Ex:
+        "scripts":{
+            "build": "rimraf .build && tsc",
+            "typeorm": "typerom-ts-node-commonjs"
+            "migration:create": "npm run typeorm migration:create -n"
+        }
+    Utilizando o comando npm run migration:create,
+    é necessário específicar o caminho da pasta em 
+    que as migrations devem ser "armazenadas", para 
+    que ao chamar aquele comando, as migrations não 
+    fiquem espalhadas dentro da raiz da aplicação.
+
+- Migrations:
+    Migrations são arquivos criados a partir de uma 
+    ORM que permitem a linguagem de programação que 
+    está sendo utilizada no desenvolvimento criar a 
+    ou as tabelas que serão utilizadas para armazenar
+    os dados/informações recebidas pela aplicação, no 
+    banco de dados.
+    As migrations, no momento da sua criação, não 
+    possuem nenhuma funcionalidade, apenas as funções
+    "up" e "down". Dentro da função up(), será posto 
+    o "query builder", ou seja, o código para criação
+    de query SQL.
+    As funções up e down possuem um parâmetro chamado
+    queryRunner. A partir deste parâmetro é chamado os 
+    métodos responsáveis por criar tabela, coluna, etc.
+    Ex:
+        public async up (queryRunner){
+            await queryRunner.createTable(
+                new Table({
+                    name: nomeDaTabela,
+                    columns:[
+                        {
+                            name: nomeDaColuna,
+                            type: tipoDeDado,
+                            isPrimaryKey: T/F
+                        }
+                    ]
+                })
+            )
+        }
+    Neste exemplo de criação de tabela, tem-se uma 
+    classe "Table", na qual é passada para seu 
+    construtor as propriedades name e columns, que 
+    se referem ao nome da tabela e suas colunas. As
+    colunas são representadas por um array de objetos
+    que, por sua vez, recebem um nome, tipo de dado e 
+    um valor boolean indicando se é uma chave primária
+    ou não (conceito de SQL). Vale lembrar que cada 
+    objeto dentro do array columns, representa uma 
+    coluna da tabela.
+    No exemplo acima é feita uma criação de tabela 
+    a partir da função "up()", a função "down()", por 
+    outro lado, serve para queries de "drop" de tabela,
+    coluna, etc.
+    Feito o código de criação e/ou drop, o comando 
+    chamado para enviar a requisição ao banco de dados
+    é o:
+        npx run typeorm migration:run -d caminhoDoIndexDatabase
+    Para queries "down", para dropar/reverter, uma 
+    implementação no banco de dados, o comando utilizado
+    é o:
+        npx run typeorm migration:revert -d caminhoDoIndexDatabase
+    obs:
+        caminhoDoIndexDatabase refere-se ao local em 
+        que o AppDataSource está sendo inicializado no 
+        banco de dados.
+        Lembrando que ele precisa ser inicializado na 
+        aplicação principal e no banco de dados.
+    obs2: 
+        os comandos utilizados para criar ou reverter
+        as migrations podem ser passados dentro de 
+        scripts no arquivo package.json.
