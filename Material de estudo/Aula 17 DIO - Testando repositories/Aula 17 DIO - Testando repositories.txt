@@ -1,0 +1,164 @@
+- Testes nos repositories:
+    Assim como outros testes vistos anteriormente os 
+    testes nos repositórios são feitos dentro de uma 
+    estrutura describe() e auxilio de funções it().
+    Nesta etapa, os conceitos de mock e injeção de 
+    dependências são constantemente utilizados para 
+    escrita dos testes, de modo também a aprofundar 
+    tais conceitos.
+    Primeiramente, é feito o mock da propriedade de 
+    gerência, ou seja, o manager. A estrutura deste 
+    mock será uma estrutura genérica, que poderá ser 
+    usada para testar outros repositórios do projeto,
+    logo, é necessário criar um arquivo dedicado só 
+    para o mock, como foi feito com os mocks de "res"
+    e "req".
+    Vale ressaltar que a estrutura describe() não é 
+    assíncrona, ou seja, não funciona com funções 
+    assíncronas como os processos da ORM de banco
+    que foi configurado ao longo das aulas. Este é 
+    mais um motivo e/ou exemplo de como mocks podem 
+    ser utilizados.
+
+- Mockando o "EntityManager":
+    Visto anteriormente, o entity manager é uma classe
+    que possui diversos atributos e métodos para que 
+    a biblioteca do typeORM possa gerenciar entidades
+    e tornar possível a criação de queries SQL.
+    É através dessa classe que cria-se atributos para 
+    desenvolvimento dos métodos dos repositories.
+    Uma particularidade dessa classe, é que ela só é 
+    inicializada após a realização de uma função 
+    assíncrona. Isto significa que para que possa-se 
+    testar, é necessário a criação de um mock.
+    O mock desta entidade deve é feito, de preferência,
+    em um arquivo dedicado (para manter o código limpo)
+    com uma função de nome genérico como "getManager".
+    Esta função deve ser assíncrona e tipada como 
+    "Promise<EntityManager>", ou seja, uma promise do 
+    tipo EntityManager.
+    No escopo da função, é criado uma variável tipada
+    como "Partial <EntityManager". Isto significa que 
+    a variável herdará somente algumas propriedades da 
+    classe.
+    E, para mockar uma função, chama-se a variável e 
+    a função de teste ".jest.fn()", juntamente com o 
+    método ".mockImplementation()" para mockar retorno.
+    O retorno da função de mock será feito usando a 
+    variável criada "como" um objeto EntityManager
+    completo. Ou seja, "variável as EntityManager".
+    Ex: 
+        import { EntityManager } from "typeorm";
+
+        export const mockGetManager = async (): Promise<EntityManager> => {
+            const manager: Partial<EntityManager> = {};
+
+            manager.save = jest.fn().mockImplementation(() => Promise.resolve())
+
+            return manager as EntityManager;
+        }
+    No exemplo acima, é testado a funcionalidade de 
+    salvar dados no banco de dados. 
+    Normalmente as aplicações salvam dados no banco 
+    a partir de dados enviados pelo usuário que, de 
+    forma menos abstrata, são objetos json recuperados
+    do corpo da requisição. Isto é, os dados que serão
+    salvos estarão sempre mudando.
+    Então, para que o teste seja otimizado, utiliza-se
+    uma interface com atributos opcionais, juntamente 
+    ao método .mockImplementation(). Este recebe um
+    callback para retornar a resposta de uma promise
+    com os dados passados como argumento para cadastro
+    no banco de dados.
+    Ex:
+        import { EntityManager } from "typeorm";
+
+        interface IMockManagerArgs {
+            saveReturn?: object | [object]
+        }
+
+        export const mockGetManager =
+            async ({ 
+                saveReturn = undefined
+                }: IMockManagerArgs): Promise<EntityManager> => {
+            const manager: Partial<EntityManager> = {};
+
+            manager.save = jest.fn().mockImplementation(() =>
+                Promise.resolve(saveReturn)
+            )
+
+            return manager as EntityManager;
+        }
+
+- Estrutura de teste: 
+    Voltando ao arquivo principal de testes uma nova
+    função é utilizada, a "beforeAll()". Esta função
+    é chamada dentro do describe() e, como o nome diz,
+    ela é executada antes de todos os testes. Dessa
+    forma, pode-se passar uma função assíncrona para 
+    uso do mock do EntityManager e instância do 
+    repositório que será testado utilizando o mock 
+    como argumento para o método construtor.
+    Ex:
+        import { mockGetManager } from "../__mocks__/mockEntityManager.mock";
+        import { UserRepository } from "./UserRepository";
+        import { User } from "../entities/User";
+        import { EntityManager } from "typeorm";
+
+        describe("Teste de UserRepository", ()=>{
+            let userRepository: UserRepository;
+            let mockManager: Partial<EntityManager>;
+
+            const mockUser: User{
+                id_user: "123",
+                name: "joao",
+                email: "pedefeijao@email.com",
+                password: "galinhaDeOuro"
+            };
+
+            beforeAll(async ()=>{
+                mockManager = await mockGetManager({});
+                userRepository = new UserRepository(mockManager as EntityManager);
+            }) 
+
+            it("Deve cadastrar um novo usuário", async ()=>{
+                await userRepository.createUser(mockUser);
+                expect(mockManager.save).toHaveBeenCalled();
+            })   
+        })
+    Perceba que o mockUser declarado após inicializar a
+    variável userRepository recebe uma tipagem "User". 
+    Esta tipagem é originada pela classe de entidade, a 
+    qual é usada para "formatar" os objetos como colunas
+    no banco banco de dados. Além da tipagem, no mock é 
+    atribuido algumas propriedades (definidas no objeto
+    de entidade) genéricas, apenas para simulação de um 
+    novo usuário a ser cadastrado pelo método createUser.
+    O resultado esperado pra esse teste, definido pelo 
+    expect, é que o método .save do mock seja chamado.
+    Uma alternativa para esse teste, ou melhor, uma forma
+    de complementar, é criar uma variável para armazenar
+    a query (ou chamada do método) e verificar se o objeto
+    retornado é compatível/igual ao objeto mockado que 
+    foi criado para testar a funcionalidade.
+    Ex:
+        beforeAll(async () => {
+            mockManager = await mockGetManager({
+                saveReturn: mockUser
+            });
+            userRepository = new UserRepository(mockManager as EntityManager);
+        })
+        it("Deve cadastrar um novo usuário", async ()=>{
+            const response = await userRepository.createUser(mockUser);
+            expect(mockManager.save).toHaveBeenCalled();
+            expect(response).toMatchObject(mockUser)
+        })
+    Dessa forma, a propriedade saveReturn, criada para
+    indicar o retorno da função .save(), anteriormente 
+    definida como undefined, assumirá como valor o mock
+    de usuário. O método .toMatchObject() irá verificar
+    se o objeto criado com ".createUser" corresponde ao 
+    retorno "saveReturn".
+
+- Validação de requests:
+    

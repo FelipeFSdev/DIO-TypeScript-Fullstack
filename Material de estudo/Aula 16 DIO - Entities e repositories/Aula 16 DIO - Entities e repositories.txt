@@ -1,0 +1,156 @@
+- Decorators:
+    Funcionalidade de linguagens de programação que 
+    permitem a adição/alteração de funcionalidade a 
+    funções ou métodos sem modificá-los diretamente.
+    São utilizados também de modo a simplificar o 
+    reuso de código e manter legibilidade.
+    Sua utilização se faz por meio do "@" seguido do
+    nome do decorator, acima da função ou método que 
+    ele irá "decorar".
+
+- Entidades:
+    São "tipos" de objetos criados em uma linguagem
+    de programação para definir os dados, tabelas e 
+    colunas que serão salvos dentro de um banco de 
+    dados.
+    Auxiliam na modelagem de dados que a aplicação 
+    deve consumir, equivalem a uma tabela do banco 
+    de dados.
+    Para fazer o controle de entidades é necessário
+    também o uso de interfaces. 
+    Em um diretório dedicado, cria-se um arquivo.ts 
+    com o nome específico da tabela que ele refere.
+    No arquivo.ts, é utilizado um "decorator" para
+    a criação de uma classe (com o mesmo nome da 
+    tabela) e definição de "entidade".
+    Ex:
+        @Entity("users")      //entidade referente a tabela "users"
+        export class User{    //objeto que representa os dados do bd
+            @PrimaryColumn({nullable: false})
+            id_user: string,
+
+            @Column({nullable: false})
+            name: string,
+
+            @Column({nullable: false})
+            email: string
+
+            constructor(id_user, name, email){
+                this.id_user = id_user,
+                this.name = name,
+                this.email = email
+            }
+        }
+    Observe que a entidade possui decorators do 
+    typeorm que simulam exatamente as colunas de 
+    uma tabela especificamento também se estas 
+    poderão ser nulas (sem valor atribuido) ou não.
+
+- Repositórios:
+    Funciona como um recipiente para armazenamento 
+    de códigos de manipulação de banco de dados 
+    (realização de CRUD) com base em métodos e 
+    funções próprias do ORM que está sendo usado.
+    Seguindo o conceito de encapsulamento, separa
+    as "preocupações" de acesso de dados de outra
+    parte do código.
+    É a camada intermediária entre a camada de 
+    negócios e a camada de dados, fornecendo uma 
+    interface para manipulação de dados fornecidos
+    pela aplicação (e representados pelas entidades).
+    Assim como as entidades, repositórios também 
+    são criados e/ou configurados em um diretório 
+    e arquivo dedicado.
+    Ex:
+        export class UserRepo{
+            private manager: EntityManager
+            constructor(manager: EntityManager){
+                this.manager = manager 
+            }
+
+            createUser = async (user: User): Promise<User> => {
+                return this.manager.save(user)
+            }
+        }
+    O trecho acima realiza a criação do repositório
+    responsável por gerenciar as entidades da tabela
+    "users", ou seja, gerenciar objetos "User", como
+    no exemplo de entidades.
+    No seu construtor é inicializado o atributo que 
+    fará o controle das entities, este sendo do tipo
+    "EntityManager".
+    Por fim, um método de criar usuário é criado
+    usando "async function". Este método possui o
+    parâmetro do tipo User (objeto declarado no 
+    tópico de entidades) e faz o salvamento do "user"
+    passado como parâmetro utilizando o método .save
+    do atributo manager.
+
+- CRUD (Create, Read, Update, Delete):
+    Operações básicas de um banco de dados referente
+    a criação, leitura, atualização e exclusão dos 
+    dados dentro do banco.
+    Ao trabalhar diretamente com sistemas de gerência
+    de banco de dados, o CRUD é feito através de 
+    queries SQL, com o uso de ORMs e repositórios, 
+    porém, essas operações ocorrem através de métodos
+    da linguagem (e orm) utilizada.
+    Dentro de um repositório, como no tópico anterior,
+    utiliza-se o método .save() para criar dados 
+    no banco.
+    A leitura, por sua vez, é feita a partir do 
+    método .find() (para retornar todos os dados),
+    ou .findOne() (para retornar o primeiro dado).
+    O método .findOne() recebe dois parâmetros, o 
+    primeiro sendo a tabela (entidade) no qual será 
+    feito a busca, e o segundo um objeto com a 
+    condição (where).
+    Ex:
+        getUser = async (userId: string): Promise<User|Null> =>{
+            return this.manager.findOne(User, {
+                where: {
+                    id_user: userId
+                }
+            })
+        }
+    Desta forma, será feita uma busca no banco de 
+    dados pelo usuário que possuir o id igual ao 
+    id passado como argumento da função getUser().
+
+- Implementação na classe service:
+    A implementação do repositório na classe de 
+    serviços é feita por meio da criação de um 
+    atributo que receberá o tipo correspondente
+    ao seu repositório. Caso seja um serviço de 
+    usuário, por exemplo, receberá o tipo
+    "repositorio de usuário".
+    Ex:
+        import {UserRepository} from "repositories/UserRepository"
+
+        class UserService {
+            private userRepository: UserRepository;
+        }
+    Em seguida, é feita a inicialização do atributo
+    pelo método construtor. Este receberá um 
+    parâmetro que assume o formato de uma instância
+    da propriedade manager do objeto datasource.
+    Ex:
+        constructor(
+            userRepository = new UserRepository(AppDataSource.manager)
+        ) {
+            this.userRepository = userRepository;
+        }
+    obs: 
+        AppDataSource é o objeto configurado a 
+        partir da classe DataSource no index do 
+        banco de dados. Configuração feita na 
+        etapa de conexão com o banco.
+    Desta forma, o atributo de serviço poderá
+    chamar as funções definidas no arquivo de 
+    repositório para criação de usuário, por 
+    exemplo, através de "métodos de serviço"
+    escritos pelo programador. As funções que
+    o repositório referencia, por sua vez,
+    referenciam o objeto de entidade, uma vez
+    que as entidades auxiliam na modelagem de 
+    dados que serão salvos no banco de dados.
