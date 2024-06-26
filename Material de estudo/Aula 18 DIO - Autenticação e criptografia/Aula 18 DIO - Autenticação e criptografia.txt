@@ -1,0 +1,233 @@
+- JWT:
+    Abreviação para Json Web Token, o jwt é uma forma de
+    codificar/criptografar informações recuperadas de 
+    uma aplicação web usando algoritmos.
+    O resultado de uma codificação é um token gerado, na 
+    maioria das vezes, para verificar autorização em uma 
+    aplicação. Uma utilização menos comum é para a troca 
+    de informações entre duas ou mais partes envolvidas.
+    Tokens jwt possuem sua estrutura dividida em partes:
+        • Header
+        • Payload
+        • Signature
+    O cabeçalho, quando traduzido para json, possui duas 
+    propriedades: alg - representando tipo de algoritmo 
+    utilizado para criptografar o objeto (padrão: HS256);
+    e typ - representando o tipo de token(JWT).
+    O payload é a "área" que carrega informações, como 
+    por exemplo, de nome, idade e cargo de um usuário.
+    Alguns tokens podem conter, em seu payload, tempo de 
+    expiração (exp), o emissor (issuer/iss) ou assunto(
+    subject/sub).
+    A assinatura, por sua vez, é a parte final do token,
+    indicando uma senha de autenticação para que sistemas
+    possam identificar se o token foi alterado ou emitido
+    por fontes confiáveis.
+    O formato final de um jwt vai consistir na junção do 
+    "token sem assinatura", que é a codificação do Header
+    e payload separados por ".", e a assinatura que é a 
+    codificação do header, payload e senha de segurança.
+
+- Utilizando jwt ao desenvolver APIs:
+    O uso do jwt em javascript e typescript é feito por 
+    meio da biblioteca jsonwebtoken.
+    Ex: 
+        npm i jsonwebtoken
+        npm i @types/jsonwebtoken (para typescript)
+    O token é gerado a partir de um método "sign()", que
+    recebe três argumentos:
+        • tokenData
+        • tokenKey
+        • tokenOptions
+    Estes, representam, respectivamente, os dados que 
+    serão criptografados e passados para o token (ou seja,
+    o payload); a chave de segurança para decriptografar
+    o token (assinatura/signature); e os dados opcionais
+    como assunto (sub), tempo de expiração (exp) e emissor
+    (iss).
+    Ex:
+        import { sign } from "jsonwebtoken"
+
+        class LoginController {
+            login = async (req, res) =>{
+                const tokenData = {
+                    dado1,
+                    dado2,
+                    dado3,
+                }
+                const tokenKey = "senhaQualquer"
+                const tokenOptions = {
+                    expiration: "10h"
+                    subject: dadoId
+                }
+                const token = sign(tokenData, tokenKey, tokenOptions);
+            }
+        }
+    A geração do token é feita no momento de autenticação
+    de um usuário, ou seja, quando o usuário insere suas 
+    credenciais corretamente. A troca de informações por 
+    jwt, por outro lado, é realizada através de um campo
+    chamado "Authorization header". A aplicação envia o 
+    token pelo Authorization header, a api decodifica os 
+    dados, realiza a verificação e define o nível de 
+    acesso. Todo este processo é feito, em um contexto de 
+    projeto, em arquivos identificados como "middleware".
+    Os middlewares têm papel específico de intermediar as
+    requisições de páginas/rotas feitas aos controladores.
+    Ex:
+        rota.get("/dadosSensiveis", middleware, controlador)
+    O middleware no caso acima deve realizar a verificação
+    de autoridade do usuário que está tentando acessar os 
+    dados sensíveis da aplicação, caso tenha autoridade 
+    suficiente, é chamado o controlador.
+    
+- Testando JWT:
+    Assim como todas as funcionalidades implementadas na 
+    API até o momento, o JWT trabalha de forma assíncrona,
+    logo, seu teste também será "async".
+    Antes de tudo, por se tratar de um teste de biblioteca
+    externa, será necessário fazer a importação de funções
+    do jsonwebtoken.
+    Ex:
+        import * as jwt from "jsonwebtoken";
+    Com a importação feita, deve-se mockar o endereço de 
+    memória da biblioteca, como feito anteriormente com o
+    UserRepository e o banco de dados.
+    Ex:
+        jest.mock("jsonwebtoken");
+    Com o service atualizado (com funções para autenticar
+    usuário e gerar o token), utiliza-se uma função para 
+    monitoramento de objetos e funções, o "jest.spyOn()".
+    O spyOn() recebe dois argumentos, o primeiro sendo o 
+    objeto que será "monitorado", e o segundo, entre aspas,
+    a função específica do objeto em questão.
+    Ex:
+        describe("serviços de usuario", () => {
+            const userService = new UserService(mockUserRepo);
+
+            it("Deve retornar token de usuário", async ()=>{
+                jest.spyOn(userService, "getAuthUser")
+
+                const token = await userService.getToken(
+                    "pedefeijao@email.com", "galinhaDeOuro"
+                )
+            })
+        })
+    Neste caso, o objeto monitorado pode ser identificado
+    como o mock dos serviços de usuário da API e a função
+    "getAuthUser" que retorna o usuário autenticado.
+    Juntamente ao spyOn, utiliza-se o mockImplementation().
+    O mockImplementation receberá um callback que retorna 
+    a resposta de uma promise, nesse caso, simulando o 
+    objeto de usuário autenticado. Este também pode estar 
+    mockado dentro do teste.
+    Ex:
+        describe("serviços de usuario", () => {
+            const userService = new UserService(mockUserRepo);
+            const mockUser = {
+                id_user: "123"
+                name: "joao"
+                email: "pedefeijao@email.com"
+                password: "galinhaDeOuro"
+            }
+            it("Deve retornar token de usuário", async ()=>{
+                jest.spyOn(userService, "getAuthUser").
+                mockImplementation(()=> Promise.resolve(mockUser));
+                
+                const token = await userService.getToken(
+                    "pedefeijao@email.com", "galinhaDeOuro"
+                )  
+            })
+        })
+    Com a estrutura acima, pode-se notar que o que está 
+    sendo testado por enquanto, na verdade, é o service,
+    e não a funcionalidade do jwt de gerar token. 
+    Para isso, juntamente ao monitoramento do userService,
+    deve ser feito o monitoramento da função responsável
+    por gerar o token, no caso, o método "sign" do jwt.
+    Ex:
+        describe("serviços de usuario", () => {
+            const userService = new UserService(mockUserRepo);
+            const mockUser = {
+                id_user: "123"
+                name: "joao"
+                email: "pedefeijao@email.com"
+                password: "galinhaDeOuro"
+            }
+            it("Deve retornar token de usuário", async ()=>{
+                jest.spyOn(userService, "getAuthUser").
+                mockImplementation(()=> Promise.resolve(mockUser));
+                jest.spyOn(jwt,"sign").
+                mockImplementation(()=> "token");
+                
+                const token = await userService.getToken(
+                    "pedefeijao@email.com", "galinhaDeOuro"
+                ) 
+                expect(token).toBe("token");
+            })
+        })
+    Teste escrito, pode-se, agora, realizar as verificações e 
+    ajustes no código (se necessário), aplicando na prática o
+    conceito de desenvolvimento orientado por testes (TDD).
+    Com o código desenvolvido até o momento, alguns erros irão
+    acontecer ao rodar os testes, o que significa que deve-se 
+    ajustar e/ou consertar os códigos "reais" da aplicação.
+    Primeiramente, verifica-se quais são os dados necessários
+    para que o controlador consiga gerar o token. Neste caso, 
+    nome, email e id, do usuário logado. Em seguida, é feita
+    uma refatoração no service de recuperação de token para 
+    que os dados sejam recuperados do banco de dados e 
+    armazenados dinamicamente em variáveis locais (dentro da 
+    função/service "getToken()"), estas as quais serão usadas
+    para passar as informações que devem ser salvas no token
+    através do método "jwt.sign()".
+    Ex:
+        export class UserService {
+        private userRepository: UserRepository;
+
+        constructor(userRepository = new UserRepository(AppDataSource.manager)) {
+            this.userRepository = userRepository;
+        };
+        public getAuthUser = async (email: string, password: string): Promise<User | null> => {
+            return this.userRepository.getUserByEmailAndPass(email, password);
+        };
+        public getToken = async (email: string, password: string): Promise<string> => {
+            const user = await this.getAuthUser(email, password);
+            const tokenData = {
+                name: user?.name,
+                email: user?.email,
+            };
+            const tokenKey = "senhaUltraSecret@123456";
+            const tokenOptions = {
+                expiration: "5h",
+                subject: user?.id_user,
+            }
+
+            const token = sign(tokenData, tokenKey, tokenOptions);
+
+            return token;
+            }
+        } 
+    Voltando para o arquivo controlador, LoginController, 
+    é necessário implementar as funções do service através
+    da instanciação do service como atributo da classe 
+    controller.
+    Ex:
+        export class LoginController {
+            protected userService: UserService
+
+            constructor(userService = new UserService()) {
+                this.userService = userService;
+            }
+        }
+    Com esta estrutura montada, basta recuperar os dados
+    da requisição informados pelo usuário e, com o método
+    getToken(), fazer a verificação dos dados e geração do
+    token.
+    Ex:
+        public login(req: Request, res: Response){
+            const {email, password} = req.body;
+            const token = this.userService.getToken(email,password);
+
+            return res.status(200).json({token});
+        }
