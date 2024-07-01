@@ -231,3 +231,69 @@
 
             return res.status(200).json({token});
         }
+
+- Enviando token para API:
+    Após realizar o login na aplicação, existem rotas
+    (ou páginas) que apresentarão diferentes dados a 
+    depender de qual usuário está logado no momento.
+    Este processo é realizado a partir da recuperação 
+    dos dados inclusos no token.
+    Para complementar o "ecossistema" de uma aplicação
+    web, existe a camada de filtragem de dados, também
+    chamada de middleware.
+    Os middlewares servem para fazer a segurança das 
+    rotas, fazendo a chamada de métodos e funções para
+    filtrar e analisar todos os dados antes de carregar
+    a "página destino".
+    Assim como controllers, middlewares são funções as
+    quais recebem parâmetros como "req" e "res", porém, 
+    com um argumento adicional "next", para indicar ao
+    sistema que pode seguir o processamento para a 
+    página final (ou próximo middleware).
+    Ex:
+        export const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
+        const { authorization } = req.headers;
+
+        if (!authorization) {
+            return res.status(401).json({ message: "Unauthorized." })
+        }
+        const authToken = authorization.replace("Bearer", "").trim();
+
+        try {
+            const { sub } = verify(authToken, "senhaUltraSecret@123456");
+
+            return next();
+
+        } catch (error) {
+            return res.status(401).json({ message: "Unauthorized." });
+        }
+        }
+    No trecho acima têm-se um exemplo básico de como 
+    uma API, mais especificamente, um middleware; faz 
+    a proteção de uma rota, verificando se o usuário
+    informado na etapa de login possui um token válido.
+    Em ambientes de teste (como insomnia e postman) o 
+    token é enviado no campo "auth" com formato "Bearer
+    token". Para o sistema, esse token é recebido como 
+    um cabeçalho da requisição, podendo ser capturado 
+    através do "req.headers".
+    Quando desestruturado, a string deve ser tratada 
+    para que seu conteúdo seja apenas o token.
+    Ex:
+        const { authorization } = req.headers;
+        authorization == "Bearer yTksaldfopasToken12etc"
+        const tokenTratado = authorization.replace("Bearer", "").trim();
+        tokenTratado == "yTksaldfopasToken12etc"
+    Por fim, dentro de um bloco try/catch, é feita a 
+    verificação do token informado através do método 
+    jwt, ".verify()". O método recebe dois parâmetros,
+    sendo o primeiro o token que será verificado, em 
+    seguida da senha verificação (tokenKey), comumente
+    armazenada em váriaveis arquivos ".env" para variáveis
+    de ambiente.
+    Feita a estruturação do middleware, para adicioná-lo
+    a rota basta realizar a chamada da função como 
+    segundo argumento das rotas, entre o caminho e o 
+    controlador.
+    Ex:
+        route.get("/user/:userId", verifyAuth, userController.getUserById);

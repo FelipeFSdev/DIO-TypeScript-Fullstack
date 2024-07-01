@@ -7,6 +7,7 @@ export class UserController {
     constructor(userService = new UserService()) {
         this.userService = userService
     }
+
     public createUser = (req: Request, res: Response): Response => {
         const { name, email, password } = req.body;
 
@@ -16,8 +17,18 @@ export class UserController {
         this.userService.createUser(name, email, password)
         return res.status(201).json({ message: "User has been registered." });
     }
-    public getUser = (req: Request, res: Response) => {
 
-        return res.status(200)
+    public getUserById = async (req: Request, res: Response) => {
+        const { userId } = req.params;
+
+        try {
+            const user = await this.userService.getUserById(userId);
+
+            return res.status(200).json({ user });
+
+        } catch (error) {
+
+        }
+
     }
 }

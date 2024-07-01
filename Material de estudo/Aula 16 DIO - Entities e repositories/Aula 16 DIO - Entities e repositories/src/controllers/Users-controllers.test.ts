@@ -9,8 +9,9 @@ import { makeMockRes } from "../__mocks__/mockResponse.mock";
 import { Request } from "express";
 
 const mockUserService = {
-    createUser: jest.fn()
-}
+    createUser: jest.fn(),
+    getUserById: jest.fn(),
+};
 
 jest.mock("../services/Users-services", () => {//Este mock de endereço de memória é realizado para mockar 
     return {                                  //um método específico da classe service (UserService), assim,
@@ -18,7 +19,7 @@ jest.mock("../services/Users-services", () => {//Este mock de endereço de memó
             return mockUserService                                  //irá implementar a propriedade userService com este mock
         })
     }
-})
+});
 
 describe("User Controller", () => {
     const userController = new UserController();
@@ -36,7 +37,7 @@ describe("User Controller", () => {
         userController.createUser(mockReqBody, mockRes)
         expect(mockRes.state.status).toBe(201)
         expect(mockRes.state.json).toMatchObject({ message: "User has been registered." })
-    })
+    });
     it("Deve retornar erro caso usuario não informe email", () => {
         const mockReq = {
             body: {
@@ -48,7 +49,7 @@ describe("User Controller", () => {
         userController.createUser(mockReq, mockRes)
         expect(mockRes.state.status).toBe(400)
         expect(mockRes.state.json).toMatchObject({ message: "Bad request. Inform all text fields to create an user." })
-    })
+    });
     it("Deve retornar erro caso usuario não informe name", () => {
         const mockReq = {
             body: {
@@ -60,7 +61,7 @@ describe("User Controller", () => {
         userController.createUser(mockReq, mockRes)
         expect(mockRes.state.status).toBe(400)
         expect(mockRes.state.json).toMatchObject({ message: "Bad request. Inform all text fields to create an user." })
-    })
+    });
     it("Deve retornar erro caso usuario não informe password", () => {
         const mockReq = {
             body: {
@@ -72,5 +73,16 @@ describe("User Controller", () => {
         userController.createUser(mockReq, mockRes)
         expect(mockRes.state.status).toBe(400)
         expect(mockRes.state.json).toMatchObject({ message: "Bad request. Inform all text fields to create an user." })
-    })
+    });
+    it("Deve retornar registro de usuario com o userId informado", () => {
+        const mockReq = makeMockReq({
+            params: {
+                userId: "123",
+            },
+        });
+        userController.getUserById(mockReq, mockRes);
+
+        expect(mockUserService.getUserById).toHaveBeenCalledWith("123");
+        expect(mockRes.state.status).toBe(200);
+    });
 })

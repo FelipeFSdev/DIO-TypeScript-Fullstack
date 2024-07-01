@@ -14,12 +14,15 @@ export class UserService {
         const user = new User(name, email, password)
         return this.userRepository.createUser(user)
     };
-    public getUser = (userID: string) => {
+
+    public getUserById = async (userID: string): Promise<User | null> => {
         return this.userRepository.getUser(userID);
     };
+
     public getAuthUser = async (email: string, password: string): Promise<User | null> => {
         return this.userRepository.getUserByEmailAndPass(email, password);
     };
+
     public getToken = async (email: string, password: string): Promise<string> => {
         const user = await this.getAuthUser(email, password);
 
